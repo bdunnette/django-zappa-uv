@@ -46,3 +46,14 @@ def test_create_and_delete_item(client):
     del_response = client.post(delete_url, follow=True)
     assert del_response.status_code == 200
     assert not Item.objects.filter(title="Lambda Integration Test").exists()
+
+
+@pytest.mark.django_db
+def test_admin_login_page_renders_without_manifest_error(client):
+    """
+    Verify that accessing /admin/login/ renders with HTTP 200 and does not raise
+    a ValueError for missing staticfiles manifest entry.
+    """
+    response = client.get(reverse("admin:login"))
+    assert response.status_code == 200
+    assert b"Django administration" in response.content

@@ -40,3 +40,15 @@ def test_secure_proxy_ssl_header_set():
     Verify SECURE_PROXY_SSL_HEADER is configured for API Gateway.
     """
     assert core.settings.SECURE_PROXY_SSL_HEADER == ("HTTP_X_FORWARDED_PROTO", "https")
+
+
+def test_whitenoise_storage_configured():
+    """
+    Verify that WhiteNoise staticfiles storage is configured with CompressedStaticFilesStorage
+    and finders enabled to avoid missing manifest entry errors on uncollected files.
+    """
+    assert (
+        core.settings.STORAGES["staticfiles"]["BACKEND"]
+        == "whitenoise.storage.CompressedStaticFilesStorage"
+    )
+    assert core.settings.WHITENOISE_USE_FINDERS is True

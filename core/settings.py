@@ -197,15 +197,19 @@ if USE_S3_STATIC:
         STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/static/"
         MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/media/"
 else:
-    # Default to WhiteNoise for fast compressed static files
+    # Default to WhiteNoise for fast compressed static files.
+    # Using CompressedStaticFilesStorage avoids 'Missing staticfiles manifest entry'
+    # errors when files are uncollected, dynamically referenced, or missing from manifest.
     STORAGES = {
         "default": {
             "BACKEND": "django.core.files.storage.FileSystemStorage",
         },
         "staticfiles": {
-            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+            "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
         },
     }
+    # Allow WhiteNoise to find static assets directly from app directories as fallback
+    WHITENOISE_USE_FINDERS = True
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

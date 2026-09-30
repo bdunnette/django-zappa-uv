@@ -86,6 +86,13 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_DEFAULT_REGION || 'us-east-2' }}
 
+      - name: Collect Static Files
+        if: steps.check-creds.outputs.has_creds == 'true'
+        env:
+          USE_S3_SQLITE: "false"
+        run: |
+          uv run python manage.py collectstatic --noinput
+
       - name: Deploy to Zappa
         if: steps.check-creds.outputs.has_creds == 'true'
         env:

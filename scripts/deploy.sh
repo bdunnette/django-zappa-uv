@@ -8,6 +8,9 @@ INITIAL="${2:-}"
 echo "==> Syncing dependencies with uv..."
 uv sync
 
+echo "==> Collecting static assets for WhiteNoise..."
+USE_S3_SQLITE=false uv run python manage.py collectstatic --noinput
+
 if [ "$INITIAL" = "--initial" ] || [ "$INITIAL" = "-i" ]; then
     echo "==> Performing initial deployment (zappa deploy $STAGE)..."
     uv run zappa deploy "$STAGE"

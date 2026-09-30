@@ -22,6 +22,10 @@ if (-not (Get-Command uv -ErrorAction SilentlyContinue)) {
 Write-Host "==> Syncing dependencies with uv..." -ForegroundColor Cyan
 uv sync
 
+Write-Host "==> Collecting static assets for WhiteNoise..." -ForegroundColor Cyan
+$env:USE_S3_SQLITE = "false"
+uv run python manage.py collectstatic --noinput
+
 if ($Initial) {
     Write-Host "==> Performing initial deployment (zappa deploy $Stage)..." -ForegroundColor Green
     uv run zappa deploy $Stage
