@@ -1,0 +1,58 @@
+name: Deploy to AWS Lambda via Zappa
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: 'Zappa stage to deploy (dev or prod)'
+        required: true
+        default: 'dev'
+
+jobs:
+  test-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+          version: "latest"
+
+      - name: Set up Python
+        run: uv python install 3.13
+
+      - name: Install dependencies
+        run: uv sync --all-extras --dev
+
+      - name: Run Pre-commit Hooks via prek
+        run: uv run prek run --all-files
+
+      - name: Run Tests
+        env:
+          USE_S3_SQLITE: "false" # Run unit tests against local SQLite
+        run: uv run pytest
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_DEFAULT_REGION || 'us-east-1' }}
+
+      - name: Deploy to Zappa
+        env:
+          STAGE: ${{ github.event.inputs.stage || 'dev' }}
+        run: |
+          # Try update first; if stack does not exist yet, run deploy
+          uv run zappa update $STAGE || uv run zappa deploy $STAGE
+
+      - name: Run Remote Migrations
+        env:
+          STAGE: ${{ github.event.inputs.stage || 'dev' }}
+        run: |
+          uv run zappa manage $STAGE migrate
