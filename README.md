@@ -259,6 +259,53 @@ uv run zappa update dev
 
 ---
 
+## Automated CI/CD with GitHub Actions
+
+The repository includes a ready-to-use GitHub Actions workflow in [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) consisting of two decoupled jobs:
+
+1. **`Lint & Test`**: Runs automatically on all pushes and pull requests. Sets up Python 3.13 via `uv`, runs pre-commit hooks via `prek` (Ruff formatting, linting, file hygiene), and executes `pytest` with `USE_S3_SQLITE=false`. **Requires zero cloud credentials.**
+2. **`Deploy to AWS Lambda`**: Triggered upon push to `main` (or via manual `workflow_dispatch`). Verifies credentials, runs `zappa update` (or `zappa deploy`), and applies remote database migrations.
+
+### Enabling Automated Deployments
+
+By default, the deployment job checks whether AWS secrets are present. If secrets are not configured, it emits a warning notice and safely skips deployment so your automated test pipeline stays green.
+
+To enable automated AWS deployments from GitHub Actions, configure the required AWS credentials as repository secrets:
+
+#### Option A: Using GitHub CLI (`gh`) (Recommended)
+
+Run the following commands in your local terminal. The GitHub CLI will prompt you securely for each value without echoing or logging sensitive keys:
+
+```bash
+# Set AWS Access Key ID
+gh secret set AWS_ACCESS_KEY_ID
+
+# Set AWS Secret Access Key
+gh secret set AWS_SECRET_ACCESS_KEY
+
+# Set AWS Default Region (e.g. us-east-2)
+gh secret set AWS_DEFAULT_REGION -b "us-east-2"
+```
+
+#### Option B: Using the GitHub Web Interface
+
+1. Navigate to your repository on GitHub.
+2. Go to **Settings** > **Secrets and variables** > **Actions**.
+3. Under **Repository secrets**, click **New repository secret**.
+4. Add the following secrets:
+   - `AWS_ACCESS_KEY_ID`: IAM access key ID with Zappa and S3 permissions.
+   - `AWS_SECRET_ACCESS_KEY`: IAM secret access key.
+   - `AWS_DEFAULT_REGION`: AWS region for your deployment (e.g., `us-east-2`).
+
+### Manual Workflow Dispatch
+
+You can also trigger a deployment on demand to any Zappa stage (e.g., `dev` or `prod`) directly from GitHub:
+1. Navigate to the **Actions** tab in your repository.
+2. Select **CI & CD (Zappa AWS Lambda)** in the left sidebar.
+3. Click **Run workflow**, choose your branch and target stage, and click **Run workflow**.
+
+---
+
 ## Windows & Cross-Platform Packaging with Docker
 
 When developing on **Windows**, some Python packages with C-extensions compiled on Windows will not execute inside the Amazon Linux Lambda environment.
