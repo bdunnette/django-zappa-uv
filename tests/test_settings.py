@@ -52,3 +52,28 @@ def test_whitenoise_storage_configured():
         == "whitenoise.storage.CompressedStaticFilesStorage"
     )
     assert core.settings.WHITENOISE_USE_FINDERS is True
+
+
+def test_stage_prefix_static_url_on_lambda(monkeypatch):
+    """
+    Verify that STATIC_URL includes the stage prefix when running in Lambda
+    without a custom domain, preventing API Gateway 403 errors on static assets.
+    """
+    monkeypatch.setenv("STAGE", "dev")
+    monkeypatch.delenv("CUSTOM_DOMAIN", raising=False)
+    reloaded = reload(core.settings)
+
+    assert reloaded.STATIC_URL == "/dev/static/"
+    assert reloaded.WHITENOISE_STATIC_PREFIX == "/static/"
+
+
+def test_default_static_url_locally(monkeypatch):
+    """
+    Verify that STATIC_URL defaults to /static/ when not running in Lambda.
+    """
+    monkeypatch.delenv("STAGE", raising=False)
+    monkeypatch.delenv("AWS_LAMBDA_FUNCTION_NAME", raising=False)
+    reloaded = reload(core.settings)
+
+    assert reloaded.STATIC_URL == "/static/"
+    assert reloaded.WHITENOISE_STATIC_PREFIX == "/static/"

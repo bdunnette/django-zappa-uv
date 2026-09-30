@@ -157,14 +157,28 @@ USE_TZ = True
 # -----------------------------------------------------------------------------
 # Static and Media Files
 # -----------------------------------------------------------------------------
-STATIC_URL = "/static/"
+# On AWS Lambda via API Gateway default execute-api domains, URLs include the stage
+# prefix (e.g. /dev/ or /prod/). Setting STATIC_URL with the stage prefix ensures the
+# browser requests /dev/static/... (avoiding API Gateway 403 Forbidden errors).
+# WHITENOISE_STATIC_PREFIX is kept as /static/ so WhiteNoise matches the stripped PATH_INFO.
+STAGE = os.environ.get("STAGE", "")
+if not STAGE and os.environ.get("AWS_LAMBDA_FUNCTION_NAME"):
+    STAGE = os.environ.get("AWS_LAMBDA_FUNCTION_NAME", "").rsplit("-", 1)[-1]
+
+if STAGE and not os.environ.get("CUSTOM_DOMAIN"):
+    STATIC_URL = f"/{STAGE}/static/"
+    MEDIA_URL = f"/{STAGE}/media/"
+else:
+    STATIC_URL = "/static/"
+    MEDIA_URL = "/media/"
+
+WHITENOISE_STATIC_PREFIX = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 try:
     STATIC_ROOT.mkdir(parents=True, exist_ok=True)
 except OSError:
     pass
 
-MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
 USE_S3_STATIC = os.environ.get("USE_S3_STATIC", "false").lower() in ("true", "1", "yes")
