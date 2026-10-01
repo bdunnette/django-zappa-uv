@@ -304,22 +304,43 @@ You can also trigger a deployment on demand to any Zappa stage (e.g., `dev` or `
 2. Select **CI & CD (Zappa AWS Lambda)** in the left sidebar.
 3. Click **Run workflow**, choose your branch and target stage, and click **Run workflow**.
 
----
+## AWS Graviton (ARM64) & Cross-Platform Packaging with Docker
 
-## Windows & Cross-Platform Packaging with Docker
+AWS Lambda in this template is configured for **ARM64 (AWS Graviton)** (`"architecture": "arm64"` in `zappa_settings.json`). When packages contain compiled C-extensions (such as cryptography, regex, or database drivers), they must be compiled for `linux/arm64` to execute properly on Graviton.
 
-When developing on **Windows**, some Python packages with C-extensions compiled on Windows will not execute inside the Amazon Linux Lambda environment.
+To ensure consistent packaging regardless of your host OS, the project pins `linux/arm64` across all container configurations:
+- **`Dockerfile`**: Uses `ARG PLATFORM=linux/arm64` and pulls `ghcr.io/astral-sh/uv:latest` and `python:3.13-slim` for `linux/arm64`.
+- **`docker-compose.yml`**: Configures `platform: linux/arm64`.
+- **`scripts/zappa-docker.sh` & `scripts/zappa-docker.ps1`**: Explicitly pass `--platform linux/arm64` to `docker build` and `docker run`.
 
-To guarantee 100% Linux binary wheel compatibility, use the provided Docker runner:
+### Running the Docker Deployment Helper
 
 ```powershell
-# Using PowerShell helper script:
+# Using PowerShell helper script (Windows):
 .\scripts\zappa-docker.ps1 update dev
 .\scripts\zappa-docker.ps1 manage dev migrate
 
-# Or using docker compose:
+# Using Bash helper script (macOS / Linux):
+./scripts/zappa-docker.sh update dev
+./scripts/zappa-docker.sh manage dev migrate
+
+# Or using Docker Compose / Podman Compose:
 docker compose run --rm zappa update dev
 ```
+
+### Running ARM64 Containers on x86_64 Hosts
+
+If your host machine uses an x86_64 (Intel/AMD) CPU, your system must support multi-architecture emulation via QEMU:
+
+- **Docker Desktop (Windows / macOS):** Emulation is built-in and enabled out of the box.
+- **Linux / WSL2 (Podman or Native Docker):** If you encounter `exec container process /bin/sh: Exec format error`, your Linux kernel needs QEMU binfmt emulation registered. Install `qemu-user-static`:
+  ```bash
+  sudo apt-get update && sudo apt-get install -y qemu-user-static binfmt-support
+  ```
+  Or register emulation via `tonistiigi/binfmt`:
+  ```bash
+  docker run --privileged --rm docker.io/tonistiigi/binfmt --install arm64
+  ```
 
 ---
 

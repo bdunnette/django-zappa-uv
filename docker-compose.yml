@@ -1,6 +1,9 @@
 services:
   zappa:
-    build: .
+    platform: linux/arm64
+    build:
+      context: .
+      dockerfile: Dockerfile
     volumes:
       # Mount AWS credentials from host
       - ~/.aws:/root/.aws:ro

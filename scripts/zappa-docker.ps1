@@ -15,14 +15,14 @@ if (-not $ZappaArgs) {
     $ZappaArgs = @("status", "dev")
 }
 
-Write-Host "==> Building Linux deployment container with uv..." -ForegroundColor Cyan
-docker build -t django-zappa-deployer .
+Write-Host "==> Building Linux ARM64 (Graviton) deployment container with uv..." -ForegroundColor Cyan
+docker build --platform linux/arm64 -t django-zappa-deployer .
 
 $awsDir = Join-Path $HOME ".aws"
 $currentDir = (Get-Location).Path
 
-Write-Host "==> Executing: zappa $($ZappaArgs -join ' ') inside Linux container..." -ForegroundColor Green
-docker run --rm `
+Write-Host "==> Executing: zappa $($ZappaArgs -join ' ') inside Linux ARM64 container..." -ForegroundColor Green
+docker run --platform linux/arm64 --rm `
     -v "${awsDir}:/root/.aws:ro" `
     -v "${currentDir}:/app" `
     -e AWS_PROFILE=$env:AWS_PROFILE `

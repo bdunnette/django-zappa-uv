@@ -2,8 +2,8 @@
   "ai": "agy",
   "ai_skills": true,
   "feature_numbering": "sequential",
-  "here": false,
+  "here": true,
   "integration": "agy",
-  "script": "ps",
+  "script": "sh",
   "speckit_version": "1.0.13"
 }

@@ -1,4 +1,6 @@
-FROM python:3.13-slim
+ARG PLATFORM=linux/arm64
+FROM --platform=${PLATFORM} ghcr.io/astral-sh/uv:latest AS uv-bin
+FROM --platform=${PLATFORM} python:3.13-slim
 
 # Install system packages required for compiling Python packages and AWS tools
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -9,7 +11,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy uv binary directly from official Astral image
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+COPY --from=uv-bin /uv /uvx /bin/
 
 WORKDIR /app
 
