@@ -422,7 +422,7 @@ uv run pytest
 ## Automated Dependency Updates (Dependabot & uv)
 
 The template includes out-of-the-box automated dependency maintenance:
-- [`.github/dependabot.yml`](file:///C:/Users/dunn0172/Documents/GitHub/django-zappa-uv/.github/dependabot.yml): Configured for weekly automated checks for Python dependencies (`pyproject.toml`) and GitHub Actions workflows every Monday at 04:00 UTC.
+- [`.github/dependabot.yml`](file:///C:/Users/dunn0172/Documents/GitHub/django-zappa-uv/.github/dependabot.yml): Configured for weekly grouped updates for Python dependencies (`pyproject.toml`) and GitHub Actions workflows every Monday at 04:00 UTC, bundling updates into consolidated PRs to minimize noise.
 - [`.github/workflows/dependabot-uv.yml`](file:///C:/Users/dunn0172/Documents/GitHub/django-zappa-uv/.github/workflows/dependabot-uv.yml):
   - **Weekly lockfile upgrades**: Automatically executes `uv lock --upgrade`, runs quality checks and unit tests, and submits an automated pull request.
   - **Dependabot lockfile synchronization**: Automatically generates and commits the matching `uv.lock` whenever Dependabot updates `pyproject.toml`.
