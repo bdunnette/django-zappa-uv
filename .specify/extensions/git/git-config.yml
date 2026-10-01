@@ -51,8 +51,8 @@ auto_commit:
     enabled: false
     message: "[Spec Kit] Save progress before issue sync"
   after_constitution:
-    enabled: false
-    message: "[Spec Kit] Add project constitution"
+    enabled: true
+    message: "docs: amend constitution to v1.1.0 (add zero-trust secret protection principle)"
   after_specify:
     enabled: false
     message: "[Spec Kit] Add specification"

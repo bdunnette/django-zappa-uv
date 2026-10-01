@@ -2,6 +2,7 @@ installed:
 - assess
 - bug
 - git
+- github
 settings:
   auto_execute_hooks: true
 hooks:
