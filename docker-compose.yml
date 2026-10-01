@@ -1,6 +1,6 @@
 services:
   zappa:
-    platform: linux/arm64
+    platform: ${DOCKER_DEFAULT_PLATFORM:-linux/arm64}
     build:
       context: .
       dockerfile: Dockerfile
@@ -11,7 +11,7 @@ services:
       - .:/app
     environment:
       - AWS_PROFILE=${AWS_PROFILE:-default}
-      - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION:-us-east-1}
+      - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION:-us-east-2}
       - SQLITE_S3_BUCKET=${SQLITE_S3_BUCKET}
       - USE_S3_SQLITE=true
     command: ["status", "dev"]

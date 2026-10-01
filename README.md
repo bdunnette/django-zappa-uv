@@ -304,28 +304,36 @@ You can also trigger a deployment on demand to any Zappa stage (e.g., `dev` or `
 2. Select **CI & CD (Zappa AWS Lambda)** in the left sidebar.
 3. Click **Run workflow**, choose your branch and target stage, and click **Run workflow**.
 
-## AWS Graviton (ARM64) & Cross-Platform Packaging with Docker
+## Multi-Architecture (ARM64 & AMD64) Packaging with Docker
 
-AWS Lambda in this template is configured for **ARM64 (AWS Graviton)** (`"architecture": "arm64"` in `zappa_settings.json`). When packages contain compiled C-extensions (such as cryptography, regex, or database drivers), they must be compiled for `linux/arm64` to execute properly on Graviton.
+AWS Lambda in this template defaults to **ARM64 (AWS Graviton)** (`"architecture": "arm64"` in `zappa_settings.json`). When packages contain compiled C-extensions (such as cryptography, regex, or database drivers), they must be compiled for the target Lambda architecture.
 
-To ensure consistent packaging regardless of your host OS, the project pins `linux/arm64` across all container configurations:
-- **`Dockerfile`**: Uses `ARG PLATFORM=linux/arm64` and pulls `ghcr.io/astral-sh/uv:latest` and `python:3.13-slim` for `linux/arm64`.
-- **`docker-compose.yml`**: Configures `platform: linux/arm64`.
-- **`scripts/zappa-docker.sh` & `scripts/zappa-docker.ps1`**: Explicitly pass `--platform linux/arm64` to `docker build` and `docker run`.
+The project provides dual-architecture compatibility across both **ARM64** and **AMD64/x86_64**:
+- **`Dockerfile`**: Multi-platform container definition leveraging multi-arch base images (`python:3.13-slim` and `ghcr.io/astral-sh/uv:latest`) and frozen dependency resolution (`uv sync --frozen`).
+- **`docker-compose.yml`**: Configures `platform: ${DOCKER_DEFAULT_PLATFORM:-linux/arm64}`, allowing dynamic platform selection.
+- **`scripts/zappa-docker.sh` & `scripts/zappa-docker.ps1`**: Build and execute container operations with explicit platform tags. Both scripts default to `linux/arm64` while allowing easy overrides to `amd64`.
 
 ### Running the Docker Deployment Helper
 
 ```powershell
-# Using PowerShell helper script (Windows):
+# Using PowerShell helper script (Windows - defaults to ARM64):
 .\scripts\zappa-docker.ps1 update dev
 .\scripts\zappa-docker.ps1 manage dev migrate
 
-# Using Bash helper script (macOS / Linux):
+# Explicitly target AMD64/x86_64 in PowerShell:
+.\scripts\zappa-docker.ps1 -Platform amd64 update dev
+
+# Using Bash helper script (macOS / Linux - defaults to ARM64):
 ./scripts/zappa-docker.sh update dev
 ./scripts/zappa-docker.sh manage dev migrate
 
+# Explicitly target AMD64 in Bash:
+TARGET_ARCH=amd64 ./scripts/zappa-docker.sh update dev
+
 # Or using Docker Compose / Podman Compose:
 docker compose run --rm zappa update dev
+# Target AMD64 via Compose:
+DOCKER_DEFAULT_PLATFORM=linux/amd64 docker compose run --rm zappa update dev
 ```
 
 ### Running ARM64 Containers on x86_64 Hosts
@@ -408,6 +416,16 @@ uv run pytest
 | **Tail CloudWatch logs** | `uv run zappa tail dev` |
 | **Check Lambda status** | `uv run zappa status dev` |
 | **Undeploy / delete stack** | `uv run zappa undeploy dev` |
+
+---
+
+## Automated Dependency Updates (Dependabot & uv)
+
+The template includes out-of-the-box automated dependency maintenance:
+- [`.github/dependabot.yml`](file:///C:/Users/dunn0172/Documents/GitHub/django-zappa-uv/.github/dependabot.yml): Configured for weekly automated checks for Python dependencies (`pyproject.toml`) and GitHub Actions workflows every Monday at 04:00 UTC.
+- [`.github/workflows/dependabot-uv.yml`](file:///C:/Users/dunn0172/Documents/GitHub/django-zappa-uv/.github/workflows/dependabot-uv.yml):
+  - **Weekly lockfile upgrades**: Automatically executes `uv lock --upgrade`, runs quality checks and unit tests, and submits an automated pull request.
+  - **Dependabot lockfile synchronization**: Automatically generates and commits the matching `uv.lock` whenever Dependabot updates `pyproject.toml`.
 
 ---
 
