@@ -60,3 +60,6 @@ htmlcov/
 # OS specific
 .DS_Store
 Thumbs.db
+
+# Spec-Kit
+.specify/extensions/.cache/
