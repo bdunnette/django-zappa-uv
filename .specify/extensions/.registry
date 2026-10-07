@@ -16,7 +16,13 @@
           "speckit.assess.decide"
         ]
       },
-      "registered_skills": [],
+      "registered_skills": [
+        "speckit-assess-intake",
+        "speckit-assess-research",
+        "speckit-assess-define",
+        "speckit-assess-shape",
+        "speckit-assess-decide"
+      ],
       "installed_at": "2026-09-30T15:30:54.105110+00:00"
     },
     "git": {
@@ -34,7 +40,13 @@
           "speckit.git.commit"
         ]
       },
-      "registered_skills": [],
+      "registered_skills": [
+        "speckit-git-feature",
+        "speckit-git-validate",
+        "speckit-git-remote",
+        "speckit-git-initialize",
+        "speckit-git-commit"
+      ],
       "installed_at": "2026-09-30T15:30:58.381808+00:00"
     },
     "bug": {
@@ -50,13 +62,20 @@
           "speckit.bug.test"
         ]
       },
-      "registered_skills": [],
+      "registered_skills": [
+        "speckit-bug-assess",
+        "speckit-bug-fix",
+        "speckit-bug-test"
+      ],
       "installed_at": "2026-09-30T15:31:02.058754+00:00"
     },
     "github": {
-      "version": "1.0.0",
-      "source": "local",
-      "manifest_hash": "sha256:4645e3b053b7218e4f22066f0d2f625b1ca44c7838879a39a3977cfa2f3f12b3",
+      "version": "1.0.1",
+      "source": {
+        "kind": "catalog",
+        "catalog": "default"
+      },
+      "manifest_hash": "sha256:7fdf8e3534a1e7253a4016f759365b4bdd6fadd8c1f6e959a20da5374eb77bf5",
       "enabled": true,
       "priority": 10,
       "registered_commands": {

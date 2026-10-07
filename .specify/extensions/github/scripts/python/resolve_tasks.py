@@ -84,7 +84,10 @@ def get_project_root(script_file: Path) -> Path:
         except OSError:
             init_root = None
         if init_root is None or not init_root.is_dir():
-            _die(f"ERROR: SPECIFY_INIT_DIR does not point to an existing directory: {raw}")
+            _die(
+                "ERROR: SPECIFY_INIT_DIR does not point to an existing "
+                f"directory: {raw}"
+            )
         if not (init_root / ".specify").is_dir():
             _die(
                 "ERROR: SPECIFY_INIT_DIR is not a Spec Kit project "
@@ -154,7 +157,9 @@ def persist_feature_json(repo_root: Path, feature_dir_value: str) -> None:
     specify_dir = repo_root / ".specify"
     specify_dir.mkdir(parents=True, exist_ok=True)
     (specify_dir / "feature.json").write_bytes(
-        (json.dumps({"feature_directory": value}, separators=(",", ":")) + "\n").encode("utf-8")
+        (json.dumps({"feature_directory": value}, separators=(",", ":")) + "\n").encode(
+            "utf-8"
+        )
     )
 
 
@@ -201,21 +206,24 @@ def main(argv: list[str]) -> int:
     if not feature_dir.is_dir():
         _die(
             f"ERROR: Feature directory not found: {feature_dir}",
-            "Run the Spec Kit specify command first to create the feature structure.",
+            "Run the Spec Kit specify command first to "
+            "create the feature structure.",
         )
 
     impl_plan = feature_dir / "plan.md"
     if not impl_plan.is_file():
         _die(
             f"ERROR: plan.md not found in {feature_dir}",
-            "Run the Spec Kit plan command first to create the implementation plan.",
+            "Run the Spec Kit plan command first to "
+            "create the implementation plan.",
         )
 
     tasks = feature_dir / "tasks.md"
     if not tasks.is_file():
         _die(
             f"ERROR: tasks.md not found in {feature_dir}",
-            "Run the Spec Kit tasks command first to create the task list.",
+            "Run the Spec Kit tasks command first to "
+            "create the task list.",
         )
 
     docs: list[str] = []
