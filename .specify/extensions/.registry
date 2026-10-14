@@ -50,9 +50,12 @@
       "installed_at": "2026-09-30T15:30:58.381808+00:00"
     },
     "bug": {
-      "version": "1.0.0",
-      "source": "local",
-      "manifest_hash": "sha256:1d0da5458f3c18ff08cf1602d88cecc33fad07068208951fb7128090cfa90c90",
+      "version": "1.0.1",
+      "source": {
+        "kind": "catalog",
+        "catalog": "default"
+      },
+      "manifest_hash": "sha256:0f8ca9b828f8855be72a17cdef1f355fba81d7173b16f349d500d2ab367384fb",
       "enabled": true,
       "priority": 10,
       "registered_commands": {
@@ -70,12 +73,12 @@
       "installed_at": "2026-09-30T15:31:02.058754+00:00"
     },
     "github": {
-      "version": "1.0.1",
+      "version": "1.0.2",
       "source": {
         "kind": "catalog",
         "catalog": "default"
       },
-      "manifest_hash": "sha256:7fdf8e3534a1e7253a4016f759365b4bdd6fadd8c1f6e959a20da5374eb77bf5",
+      "manifest_hash": "sha256:384027822560387c1b5573452e64d63e20de9edb79305fa4d57ace2d9d69848c",
       "enabled": true,
       "priority": 10,
       "registered_commands": {
@@ -83,7 +86,9 @@
           "speckit.github.taskstoissues"
         ]
       },
-      "registered_skills": [],
+      "registered_skills": [
+        "speckit-github-taskstoissues"
+      ],
       "installed_at": "2026-09-30T17:55:11.358845+00:00"
     }
   }
